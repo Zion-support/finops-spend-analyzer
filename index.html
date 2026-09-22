@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinOps Spend Analyzer — Zion Tech Group</title>
+<meta name="description" content="Diagnóstico rápido de gastos de nuvem e GenAI. Informe seus gastos mensais, receba categorias de desperdício e um relatório para a diretoria.">
+<link rel="canonical" href="https://ziontechgroup.com/finops-spend-analyzer/">
+<meta property="og:title" content="FinOps Spend Analyzer — Zion Tech Group">
+<meta property="og:description" content="Diagnóstico de gastos de nuvem e IA. Identifique desperdício antes de renegociar.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ziontechgroup.com/finops-spend-analyzer/">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --muted: #8888a0;
+    --accent: #4f8cff;
+    --accent2: #7c5cff;
+    --green: #34d399;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  header { border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+  .logo { font-weight: 700; font-size: 1.1rem; color: var(--accent); text-decoration: none; }
+  .logo span { color: var(--text); }
+  nav { display: flex; gap: 20px; align-items: center; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  nav a:hover { color: var(--text); }
+  nav .btn-nav { background: var(--accent); color: #fff !important; padding: 6px 14px; border-radius: 6px; font-weight: 600; }
+  nav .btn-nav:hover { background: var(--accent2); color: #fff !important; }
+  main { padding: 48px 0 80px; }
+  h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 40px; max-width: 600px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .card h2 { font-size: 1.2rem; margin-bottom: 20px; color: var(--text); }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-group input, .form-group select { width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; font-family: var(--font); transition: border-color 0.2s; }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; text-decoration: none; transition: transform 0.15s, box-shadow 0.15s; width: 100%; justify-content: center; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(79,140,255,0.3); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text); padding: 10px 20px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; border: 1px solid var(--border); cursor: pointer; text-decoration: none; transition: border-color 0.2s; }
+  .btn-secondary:hover { border-color: var(--accent); }
+  .results { display: none; margin-top: 32px; animation: fadeUp 0.4s ease; }
+  .results.visible { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px; }
+  @media (max-width: 480px) { .result-grid { grid-template-columns: 1fr; } }
+  .result-item { background: var(--surface2); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+  .result-item .value { font-size: 1.6rem; font-weight: 700; color: var(--accent); }
+  .result-item .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+  .result-item.red .value { color: var(--red); }
+  .result-item.yellow .value { color: var(--yellow); }
+  .result-item.green .value { color: var(--green); }
+  .waste-list { list-style: none; padding: 0; margin: 16px 0; }
+  .waste-list li { padding: 12px 0 12px 28px; position: relative; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .waste-list li:last-child { border-bottom: none; }
+  .waste-list li::before { content: '⚠'; position: absolute; left: 0; color: var(--yellow); font-size: 1rem; }
+  .waste-list li.high::before { content: '🚨'; color: var(--red); }
+  .waste-list li.low::before { content: '✓'; color: var(--green); }
+  .waste-list li .waste-title { font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+  .waste-list li .waste-detail { font-size: 0.8rem; color: var(--muted); }
+  .board-report { background: var(--surface2); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+  .board-report h4 { font-size: 0.85rem; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .board-report pre { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px; font-size: 0.8rem; color: var(--text); overflow-x: auto; white-space: pre-wrap; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+  .badge { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; color: var(--muted); margin-bottom: 12px; }
+  .footer { border-top: 1px solid var(--border); margin-top: 60px; padding: 32px 0; color: var(--muted); font-size: 0.85rem; }
+  .footer-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+  .footer-links { display: flex; gap: 16px; flex-wrap: wrap; }
+  .footer-links a { color: var(--muted); text-decoration: none; }
+  .footer-links a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+<header>
+  <div class="container header-inner">
+    <a href="https://ziontechgroup.com/" class="logo">Zion <span>Tech Group</span></a>
+    <nav>
+      <a href="https://ziontechgroup.com/discovery/">Discovery $99</a>
+      <a href="https://ziontechgroup.com/plans/">Plans</a>
+      <a href="https://ziontechgroup.com/ai-roi-calculator/">ROI Calculator</a>
+      <a href="https://ziontechgroup.com/ai-agent-workflow-builder/">Workflow Builder</a>
+      <a href="https://ziontechgroup.com/managed-it-health-check/">IT Health Check</a>
+      <a href="https://ziontechgroup.com/contact/" class="btn-nav">Contato</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <span class="badge">Diagnóstico gratuito · Sem cadastro · Sem garantir % de economia</span>
+    <h1>FinOps Spend Analyzer</h1>
+    <p class="subtitle">Informe seus gastos mensais de nuvem e IA, receba categorias de desperdício identificadas e um relatório para a diretoria. Não inventamos percentual de economia — só mapeamos onde o gasto pode estar saindo do controle.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>1. Seus gastos</h2>
+        <form id="finops-form">
+          <div class="form-group">
+            <label for="company">Empresa / contexto (opcional)</label>
+            <input type="text" id="company" placeholder="Ex: Minha empresa, setor X">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cloud-aws">AWS — gasto mensal (R$)</label>
+              <input type="number" id="cloud-aws" placeholder="Ex: 8000" min="0" step="100">
+            </div>
+            <div class="form-group">
+              <label for="cloud-azure">Azure — gasto mensal (R$)</label>
+              <input type="number" id="cloud-azure" placeholder="Ex: 5000" min="0" step="100">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cloud-gcp">GCP — gasto mensal (R$)</label>
+              <input type="number" id="cloud-gcp" placeholder="Ex: 3000" min="0" step="100">
+            </div>
+            <div class="form-group">
+              <label for="cloud-other">Outra nuvem / hospedagem — mensal (R$)</label>
+              <input type="number" id="cloud-other" placeholder="Ex: 2000" min="0" step="100">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="genai-spend">Gasto mensal com IA / LLMs / APIs (R$)</label>
+              <input type="number" id="genai-spend" placeholder="Ex: 2000" min="0" step="100">
+            </div>
+            <div class="form-group">
+              <label for="saaS-spend">SaaS corporativo mensal (R$) — CRM, ITSM, etc.</label>
+              <input type="number" id="saas-spend" placeholder="Ex: 5000" min="0" step="100">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="servers">Quantos servidores / VMs / instâncias você estima ter?</label>
+            <input type="number" id="servers" placeholder="Ex: 40" min="0">
+          </div>
+          <div class="form-group">
+            <label for="environments">Quantos ambientes (dev, staging, prod) você opera?</label>
+            <select id="environments">
+              <option value="1">Apenas produção</option>
+              <option value="2">Prod + 1 ambiente (dev ou staging)</option>
+              <option value="3">Prod + 2 ambientes</option>
+              <option value="4+">4+ ambientes — provável excesso</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="untagged">Você tem recursos untagged na nuvem?</label>
+            <select id="untagged">
+              <option value="unknown">Não sei / não meço</option>
+              <option value="yes-many">Sim, muitos — não tenho controle</option>
+              <option value="yes-some">Sim, alguns — sei onde estão</option>
+              <option value="no">Não — todo recurso tem tag de owner/projeto</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="idle-suspected">Você suspeita de recursos ociosos (instâncias sempre ligadas sem uso)?</label>
+            <select id="idle-suspected">
+              <option value="unknown">Não sei</option>
+              <option value="yes">Sim — tenho suspeita forte</option>
+              <option value="no">Não — todos os recursos têm owner ativo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="commitments">Você tem reservas / commit / savings plans ativos?</label>
+            <select id="commitments">
+              <option value="none">Nenhum — todo on-demand</option>
+              <option value="partial">Parcial — alguns, mas não cobrem toda a base</option>
+              <option value="most">A maioria da base está em commit</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary">Analisar gastos</button>
+        </form>
+      </div>
+
+      <div>
+        <div class="card" style="height: fit-content;">
+          <h2>2. Diagnóstico de gastos</h2>
+          <div id="results" class="results">
+            <div class="result-grid" id="result-grid">
+              <!-- populated by JS -->
+            </div>
+
+            <ul class="waste-list" id="waste-list">
+              <!-- populated by JS -->
+            </ul>
+
+            <div class="board-report">
+              <h4>Relatório para a diretoria (copiar)</h4>
+              <pre id="board-report-text">—</pre>
+            </div>
+
+            <div class="cta-row">
+              <a href="https://ziontechgroup.com/discovery/" class="btn-primary" style="width: auto; padding: 12px 24px;">Discovery $99 — mapear a conta de nuvem</a>
+              <a href="https://buy.stripe.com/8x214o8NW35l5Xp3hm4ZG0b" class="btn-secondary" style="width: auto; padding: 12px 24px;" target="_blank">Pagar Discovery $99 (USD)</a>
+            </div>
+            <p style="margin-top: 12px; font-size: 0.8rem; color: var(--muted);">
+              Depois do Discovery: <a href="https://ziontechgroup.com/finops-consulting/" style="color: var(--accent);">Consulting $499</a> ·
+              <a href="https://ziontechgroup.com/plans/" style="color: var(--accent);">Starter $2.500</a> (primeiro corte implementado) ·
+              <a href="https://ziontechgroup.com/plans/" style="color: var(--accent);">Growth $8.000/mês</a> (operação de FinOps mensal + SLA)
+            </p>
+          </div>
+          <div id="results-placeholder" style="color: var(--muted); font-size: 0.9rem; padding: 20px 0;">
+            Preencha seus gastos e clique em "Analisar". Receba categorias de desperdício e um relatório para a diretoria — sem inventar percentual de economia.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <a href="https://ziontechgroup.com/" style="color: var(--accent); font-weight: 600;">Zion Tech Group</a> · FinOps · Otimização de nuvem · Controle de gasto de IA
+      <br><span style="font-size: 0.75rem;">Sem inventar % de economia. Discovery primeiro.</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://ziontechgroup.com/discovery/">Discovery $99</a>
+      <a href="https://ziontechgroup.com/plans/">Plans</a>
+      <a href="https://ziontechgroup.com/ai-roi-calculator/">ROI Calculator</a>
+      <a href="https://ziontechgroup.com/ai-agent-workflow-builder/">Workflow Builder</a>
+      <a href="https://ziontechgroup.com/managed-it-health-check/">IT Health Check</a>
+      <a href="https://ziontechgroup.com/contact/">Contato</a>
+      <a href="https://github.com/Zion-support/finops-spend-analyzer">Código</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  const form = document.getElementById('finops-form');
+  const results = document.getElementById('results');
+  const placeholder = document.getElementById('results-placeholder');
+
+  function fmt(n) {
+    if (!n || n < 1000) return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+    return 'R$ ' + (n / 1000).toFixed(1) + 'k';
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const aws = parseFloat(document.getElementById('cloud-aws').value) || 0;
+    const azure = parseFloat(document.getElementById('cloud-azure').value) || 0;
+    const gcp = parseFloat(document.getElementById('cloud-gcp').value) || 0;
+    const other = parseFloat(document.getElementById('cloud-other').value) || 0;
+    const genai = parseFloat(document.getElementById('genai-spend').value) || 0;
+    const saas = parseFloat(document.getElementById('saas-spend').value) || 0;
+    const servers = parseInt(document.getElementById('servers').value) || 0;
+    const environments = parseInt(document.getElementById('environments').value) || 1;
+    const untagged = document.getElementById('untagged').value;
+    const idle = document.getElementById('idle-suspected').value;
+    const commitments = document.getElementById('commitments').value;
+    const company = document.getElementById('company').value.trim() || 'Sua empresa';
+
+    const totalCloud = aws + azure + gcp + other;
+    const totalAll = totalCloud + genai + saas;
+    const monthlyTotal = totalAll;
+    const annualTotal = monthlyTotal * 12;
+
+    // Estimativas de desperdício baseadas em padrões de mercado (não garantias)
+    let wasteItems = [];
+    let totalWasteEstimate = 0;
+
+    // 1. Idle compute (15-30% de cloud sem owner ativo)
+    if (idle === 'yes' && totalCloud > 0) {
+      const idleEst = Math.round(totalCloud * 0.22);
+      wasteItems.push({ level: 'high', title: 'Compute ocioso (estimado)', detail: '~22% do cloud sem owner ativo — ' + fmt(idleEst) + '/mes. Idleness é o corte mais barato porque ninguém está usando.' });
+      totalWasteEstimate += idleEst;
+    } else if (idle === 'unknown' && totalCloud > 5000) {
+      wasteItems.push({ level: 'warning', title: 'Compute ocioso — não medido', detail: 'Com ' + fmt(totalCloud) + '/mes de cloud e sem medição de idle, é provável que 10-20% esteja ocioso. Medir antes de recortar.' });
+    }
+
+    // 2. Orphans (volumes, IPs, snapshots não anexados)
+    if (servers > 20 && totalCloud > 0) {
+      const orphanEst = Math.round(totalCloud * 0.05);
+      wasteItems.push({ level: 'high', title: 'Recursos órfãos (estimado)', detail: 'Com ' + servers + ' servidores, é provável que volumes, IPs e snapshots não anexados existam. ~5% do cloud: ' + fmt(orphanEst) + '/mes. Orphans são o corte mais barato — ninguém os usa.' });
+      totalWasteEstimate += orphanEst;
+    }
+
+    // 3. Unowned environments
+    if (environments >= 3) {
+      wasteItems.push({ level: 'warning', title: 'Múltiplos ambientes sem owner claro', detail: environmentCountText(environments) + ' — ambientes extras sem owner nomeado tendem a acumular gasto. Validar owner de cada ambiente.' });
+    }
+
+    // 4. Tagging gaps
+    if (untagged === 'yes-many' || untagged === 'unknown') {
+      wasteItems.push({ level: 'high', title: 'Gap de tagging', detail: 'Recursos sem tag de owner/projeto não podem ser alocados. Isso impede relatório que finance confia. Prioridade alta antes de qualquer renegociação de commit.' });
+    }
+
+    // 5. GenAI spend
+    if (genai > 1000) {
+      const genaiFlags = [];
+      if (commitments === 'none' && totalCloud > 0) {
+        genaiFlags.push('Sem commit/embeddings otimizados — gasto de IA sem envelope');
+      }
+      if (untagged === 'yes-many' || untagged === 'unknown') {
+        genaiFlags.push('Chaves de IA provavelmente untagged / compartilhadas');
+      }
+      const genaiWaste = Math.round(genai * 0.15);
+      wasteItems.push({ level: genaiFlags.length > 0 ? 'high' : 'warning', title: 'Gasto de IA/GenAI — ' + fmt(genai) + '/mes', detail: genaiFlags.length > 0 ? 'Sinais de que o controle está ausente: ' + genaiFlags.join('; ') + '. Estimativa de ~15% (' + fmt(genaiWaste) + '/mes) pode ser otimizada com tagging, model routing e budget alerts.' : 'IA gasta ' + fmt(genai) + '/mes. Com tagging e budget alerts, é possível reduzir retrabalho e retries.' });
+      totalWasteEstimate += genaiWaste;
+    }
+
+    // 6. Commitments
+    if (commitments === 'none' && totalCloud > 2000) {
+      wasteItems.push({ level: 'warning', title: 'Sem commits / savings plans', detail: 'Todo on-demand com ' + fmt(totalCloud) + '/mes de cloud. Com uso estável, reservas e savings plans podem reduzir a linha de base — mas só após o mapa ser honesto.' });
+    }
+
+    // 7. SaaS sprawl
+    if (saas > 3000) {
+      wasteItems.push({ level: 'warning', title: 'Gasto de SaaS — ' + fmt(saas) + '/mes', detail: 'SaaS corporativo alto. Possível duplicação de ferramentas ou licenças subutilizadas. Mapear antes de renegociar.' });
+    }
+
+    // Render results
+    const resultGrid = document.getElementById('result-grid');
+    resultGrid.innerHTML = '';
+
+    const items = [
+      { label: 'Gasto total mensal (nuvem + IA + SaaS)', value: fmt(monthlyTotal), cls: monthlyTotal > 20000 ? 'red' : monthlyTotal > 5000 ? 'yellow' : 'green' },
+      { label: 'Gasto anual estimado', value: fmt(annualTotal), cls: annualTotal > 240000 ? 'red' : annualTotal > 60000 ? 'yellow' : 'green' },
+      { label: 'Total cloud mensal', value: fmt(totalCloud), cls: totalCloud > 15000 ? 'red' : totalCloud > 3000 ? 'yellow' : 'green' },
+      { label: 'Gasto de IA/GenAI mensal', value: fmt(genai), cls: genai > 3000 ? 'red' : genai > 500 ? 'yellow' : 'green' },
+      { label: 'Desperdício estimado (mensal)', value: fmt(totalWasteEstimate), cls: totalWasteEstimate > 2000 ? 'red' : totalWasteEstimate > 200 ? 'yellow' : 'green' },
+      { label: 'Potencial de corte anual (estimativa)', value: fmt(totalWasteEstimate * 12), cls: totalWasteEstimate * 12 > 24000 ? 'red' : totalWasteEstimate * 12 > 2400 ? 'yellow' : 'green' },
+    ];
+
+    items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'result-item ' + item.cls;
+      el.innerHTML = '<div class="value">' + item.value + '</div><div class="label">' + item.label + '</div>';
+      resultGrid.appendChild(el);
+    });
+
+    // Waste list
+    const wasteList = document.getElementById('waste-list');
+    wasteList.innerHTML = '';
+    if (wasteItems.length === 0) {
+      wasteList.innerHTML = '<li class="low"><span class="waste-title">Nenhum sinal de desperdício identificado</span><span class="waste-detail">Com os dados informados, não há padrão óbvio de desperdício. Manter monitoramento e tagging é o próximo passo.' + (totalCloud > 0 ? ' Para um diagnóstico mais preciso, Discovery $99 com acesso de leitura à sua conta de nuvem mapeia owners e recursos reais.' : '') + '</span></li>';
+    } else {
+      wasteItems.forEach(w => {
+        const li = document.createElement('li');
+        li.className = w.level;
+        li.innerHTML = '<span class="waste-title">' + w.title + '</span><span class="waste-detail">' + w.detail + '</span>';
+        wasteList.appendChild(li);
+      });
+    }
+
+    // Board report
+    const boardLines = [];
+    boardLines.push('RELATÓRIO FINOPS — ' + company.toUpperCase());
+    boardLines.push('------------------------------------------------------------');
+    boardLines.push('Gasto cloud mensal: ' + fmt(totalCloud) + ' (' + fmt(totalCloud * 12) + '/ano)');
+    boardLines.push('Gasto IA/GenAI mensal: ' + fmt(genai) + ' (' + fmt(genai * 12) + '/ano)');
+    boardLines.push('SaaS corporativo mensal: ' + fmt(saas) + ' (' + fmt(saas * 12) + '/ano)');
+    boardLines.push('Total mensal (nuvem + IA + SaaS): ' + fmt(monthlyTotal) + ' — anual: ' + fmt(annualTotal));
+    boardLines.push('------------------------------------------------------------');
+    if (wasteItems.length > 0) {
+      boardLines.push('Categorias de desperdício mapeadas:');
+      wasteItems.forEach(w => {
+        boardLines.push('  • ' + w.title + ' — ' + w.detail);
+      });
+      boardLines.push('------------------------------------------------------------');
+      boardLines.push('Desperdício estimado: ' + fmt(totalWasteEstimate) + '/mes — ' + fmt(totalWasteEstimate * 12) + '/ano (ordem de grandeza, não garantia)');
+    } else {
+      boardLines.push('Nenhuma categoria de desperdício óbvia com os dados informados.');
+      if (totalCloud > 0) {
+        boardLines.push('Próximo passo: Discovery $99 para acesso de leitura à conta e mapeamento real de owners/tags.');
+      }
+    }
+    boardLines.push('------------------------------------------------------------');
+    boardLines.push('Nota: estimativas de ordem de grandeza, não garantia financeira. Dados reais exigem acesso à conta.');
+    boardLines.push('Próximo passo sugerido: Discovery $99 (diagnóstico de gasto de nuvem).');
+
+    document.getElementById('board-report-text').textContent = boardLines.join('\n');
+
+    placeholder.style.display = 'none';
+    results.classList.add('visible');
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  function environmentCountText(n) {
+    if (n <= 1) return '1 ambiente';
+    if (n === 2) return '2 ambientes';
+    if (n === 3) return '3 ambientes';
+    return n + '+ ambientes';
+  }
+
+  window.addEventListener('load', function() {
+    // Pre-fill for demo
+    document.getElementById('cloud-aws').value = 8000;
+    document.getElementById('cloud-azure').value = 4000;
+    document.getElementById('cloud-gcp').value = 2000;
+    document.getElementById('genai-spend').value = 1800;
+    document.getElementById('saas-spend').value = 4500;
+    document.getElementById('servers').value = 35;
+    document.getElementById('environments').value = '3';
+    document.getElementById('untagged').value = 'yes-many';
+    document.getElementById('idle-suspected').value = 'yes';
+    document.getElementById('commitments').value = 'partial';
+  });
+})();
+</script>
+</body>
+</html>
