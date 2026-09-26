@@ -9,4 +9,8 @@ FinOps Spend Analyzer is part of the [Zion App Network](https://ziontechgroup.co
 ## Related FinOps apps
 [AI FinOps Suite](https://ziontechgroup.com/ai-finops-suite/) · [FinOps Autopilot](https://ziontechgroup.com/finops-autopilot/) · [Cloud Cost Estimator](https://ziontechgroup.com/cloud-cost-estimator/) · [Zion AI ROI Calculator](https://ziontechgroup.com/zion-ai-roi-calculator/) · [AI Cloud Optimizer](https://ziontechgroup.com/ai-cloud-optimizer/) · [AI Compute Optimizer](https://ziontechgroup.com/ai-compute-optimizer/) · [Cloud Architect Diagram Builder](https://ziontechgroup.com/cloud-architect-diagram-builder/)
 
+## 🌟 FinOps & Cloud Cost Suite (GitHub)
+- [Cloud Cost Estimator](https://github.com/Zion-support/cloud-cost-estimator) · [AI Cloud Optimizer](https://github.com/Zion-support/ai-cloud-optimizer) · [AI Compute Optimizer](https://github.com/Zion-support/ai-compute-optimizer) · [Revenue Recognition Copilot](https://github.com/Zion-support/revenue-recognition-copilot) · [AI Billing Automation](https://github.com/Zion-support/ai-billing-automation)
+- Suite spotlight: [finops-cloud-cost-suite.md](https://github.com/Zion-support/zion-network/blob/main/spotlights/finops-cloud-cost-suite.md)
+
 © 2026 Zion Tech Group · https://ziontechgroup.com
